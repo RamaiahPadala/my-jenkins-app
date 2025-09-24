@@ -87,6 +87,22 @@ app.get('/api/info', (req, res) => {
     });
 });
 
+app.get('/pipeline-info', (req, res) => {
+    res.json({
+        message: 'This endpoint was added to test the CI/CD pipeline!',
+        build_number: process.env.BUILD_NUMBER || 'local',
+        deployment_time: new Date().toISOString(),
+        pipeline_stages: [
+            'Checkout Code',
+            'Install Dependencies', 
+            'Run Tests',
+            'Build Docker Image',
+            'Deploy Application',
+            'Health Check'
+        ]
+    });
+});
+
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
