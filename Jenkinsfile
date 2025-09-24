@@ -80,40 +80,40 @@ pipeline {
         }
         
         stage('Health Check & Verification') {
-            steps {
-                echo '🔍 Performing health check...'
-                script {
-                    // Wait for application to start
-                    echo '⏳ Waiting for application to start...'
-                    sleep 15
-                    
-                    // Check if container is running
-                    sh '''
-                        if docker ps | grep -q my-node-app-container; then
-                            echo "✅ Container is running"
-                        else
-                            echo "❌ Container failed to start"
-                            docker logs my-node-app-container
-                            exit 1
-                        fi
-                    '''
-                    
-                    // Test health endpoint
-                    echo '🏥 Testing health endpoint...'
-                    sh """
-                        curl -f http://localhost:${PORT}/health || exit 1
-                        echo "✅ Health check passed"
-                    """
-                    
-                    // Test main application
-                    echo '🌐 Testing main application...'
-                    sh """
-                        curl -f http://localhost:${PORT}/ | grep -q "Hello from Jenkins" || exit 1
-                        echo "✅ Application is responding correctly"
-                    """
-                }
-            }
+    steps {
+        echo '🔍 Performing health check...'
+        script {
+            // Wait for application to start
+            echo '⏳ Waiting for application to start...'
+            sleep 15
+
+            // Check if container is running
+            sh '''
+                if docker ps | grep -q my-node-app-container; then
+                    echo "✅ Container is running"
+                else
+                    echo "❌ Container failed to start"
+                    docker logs my-node-app-container
+                    exit 1
+                fi
+            '''
+
+            // Test health endpoint using the container name for network resolution
+            echo '🏥 Testing health endpoint...'
+            sh """
+                curl -f http://my-node-app-container:3000/health || exit 1
+                echo "✅ Health check passed"
+            """
+
+            // Test main application using the container name for network resolution
+            echo '🌐 Testing main application...'
+            sh """
+                curl -f http://my-node-app-container:3000/ | grep -q "Hello from Jenkins" || exit 1
+                echo "✅ Application is responding correctly"
+            """
         }
+    }
+}
         
         stage('Display Access Information') {
             steps {
